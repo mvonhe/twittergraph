@@ -1,86 +1,143 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="//d3js.org/d3.v4.0.0-alpha.40.min.js"></script>
 
-.links line {
-  stroke: #aaa;
-}
+        <style>
+        body {
+            background: #c0e6ff;
+        }
 
-.nodes circle {
-  pointer-events: all;
-  stroke: none;
-  stroke-width: 40px;
-}
+        .links line {
+          stroke: #aaa;
+        }
 
-</style>
-<svg width="960" height="600"></svg>
-<script src="//d3js.org/d3.v4.0.0-alpha.40.min.js"></script>
-<script>
+        .nodes circle {
+          pointer-events: all;
+          stroke: none;
+          stroke-width: 40px;
+        }
+        #container {
+            background: white;
+            padding: 50px;
+            width: 60%;
+            margin: auto;
+            font-family: Arial, sans-serif;
+            border: none;
+        }
+        #disclaimer{
+        font-size: x-small}
+        a {
+            color:#5596e6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;;
+        }
+        a:visited {
+            color: #325c80;
+        }
+            svg {
+                width: 100%;s
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <h4>Twitter Graph v0.1</h4>
+                {%  if screenname %}
+            <h1>
+            <a href="https://twitter.com/{{ screenname }}">{{ displayName }}</a></h1>
+            Screenname: {{ screenname }}
+            Display name: {{ displayName }}
 
-var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+                {% else %}
+            <form action="">
+                <label for="screenname">Type a twitter handle (case sensitive)</label>
+                <input type="text" name="screenname">
+                <input type="submit" value="submit">
+                <br>
+            </form>
+            <br>
+            <h1><a href="https://twitter.com/archer_sterling?lang=en-gb">Sterling Archer's</a> twitter friends</h1>
+            <br>
+            <p>Hover over the dots to see their names</p>
+            <p>Drag them to see what happens</p>
+                {% endif %}
+        <svg width="500" height="600"></svg>
+        <p id="disclaimer">
+            Running on IBM Bluemix with the <a href="https://python-twitter.readthedocs.io/en/latest/">python-twitter </a>library.
+                Based on Mike Bostock's <a href="http://bl.ocks.org/mbostock/2675ff61ea5e063ede2b5d63c08020c7">Force Dragging I</a>.</p>
+            </div>
+        <script>
 
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
+        var svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
 
-d3.json("../static/the.json", function(error, graph) {
-  if (error) throw error;
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function(d) { return d.id; }))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
 
-  var link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links)
-    .enter().append("line");
+        d3.json("../static/the.json", function(error, graph) {
+          if (error) throw error;
 
-  var node = svg.append("g")
-      .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes)
-    .enter().append("circle")
-      .attr("r", 2.5)
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
+          var link = svg.append("g")
+              .attr("class", "links")
+            .selectAll("line")
+            .data(graph.links)
+            .enter().append("line");
 
-  node.append("title")
-      .text(function(d) { return d.id; });
+          var node = svg.append("g")
+              .attr("class", "nodes")
+            .selectAll("circle")
+            .data(graph.nodes)
+            .enter().append("circle")
+              .attr("r", 2.5)
+              .call(d3.drag()
+                  .on("start", dragstarted)
+                  .on("drag", dragged)
+                  .on("end", dragended));
 
-  simulation
-      .nodes(graph.nodes)
-      .on("tick", ticked);
+          node.append("title")
+              .text(function(d) { return d.id; });
 
-  simulation.force("link")
-      .links(graph.links);
+          simulation
+              .nodes(graph.nodes)
+              .on("tick", ticked);
 
-  function ticked() {
-    link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
+          simulation.force("link")
+              .links(graph.links);
 
-    node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-  }
-});
+          function ticked() {
+            link
+                .attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
 
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart()
-  simulation.fix(d);
-}
+            node
+                .attr("cx", function(d) { return d.x; })
+                .attr("cy", function(d) { return d.y; });
+          }
+        });
 
-function dragged(d) {
-  simulation.fix(d, d3.event.x, d3.event.y);
-}
+        function dragstarted(d) {
+          if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+          simulation.fix(d);
+        }
 
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  simulation.unfix(d);
-}
+        function dragged(d) {
+          simulation.fix(d, d3.event.x, d3.event.y);
+        }
 
-</script>
+        function dragended(d) {
+          if (!d3.event.active) simulation.alphaTarget(0);
+          simulation.unfix(d);
+        }
+
+        </script>
+    </body>
+</html>
