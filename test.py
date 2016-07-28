@@ -7,7 +7,16 @@ api=twitter_test.api
 
 friends=api.GetFriends(screen_name='mvheyl')
 
-for fr in friends[10]:
-    print len(api.GetFriends())
-print friends[:10]
+print 'hiii there n00b'
+for fr in friends[5:10]:
+    name=fr.name
+    fid = fr.id
+    print 'fr name= '+name, 'fr id = '+str(fid)
+    #friendsfriends=api.GetFriends(screen_name=name).AsDict()
+    #for f in friendsfriends[:10]:
+    #    print 'f= '+str(f)
+    #print len(friendsfriends)
+#print friends[:10]
 #print len(friendsfriends)
+
+twitter_test.writefile(friends[0].name)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import twitter, json, codecs, random
+import twitter, json, codecs, random, os, re, glob
 
 api = twitter.Api(consumer_key="UCQpUai3HNPvVQakSjq17GuKg",
                   consumer_secret="dgf58jmBmjUtTQzE2YQq6NskgefNvwaa2xBRDVhj9W584jODnj",
                   access_token_key="2805260366-UfU753RVPQc16AHS9tHO2mrC6FMFkmc1nsUry7g",
-                  access_token_secret="6FOcFNT1wacIYPmVBIjMefCrAP4nyl3pmylxhpRKzhfMx")
-
+                  access_token_secret="6FOcFNT1wacIYPmVBIjMefCrAP4nyl3pmylxhpRKzhfMx",
+                  sleep_on_rate_limit=True)
 
 ## text input
 thisname = "Archer_Sterling"
@@ -15,8 +15,18 @@ def getFriends(name):
     return api.GetFriends(screen_name=name)
 
 def writeJson(name):
-    friends=getFriends(name)
-    infile = codecs.open('static/the.json', 'w', 'utf-8')
+    #get correct filename
+    oldfile = glob.glob('static/the*.json')[0]
+    try:
+        number = int(re.search('\d+', oldfile).group(0))
+    except AttributeError:
+        number=0
+    number += 1
+    filename = 'static/the' + str(number%10) + '.json'
+    infile = codecs.open(filename, 'w', 'utf-8')
+
+    friends = getFriends(name)
+    cnt=0
     infile.write('{\n  "nodes": [\n')
     ### don't forget the root node! :)
     infile.write('  {"id": "' + name + '", "group": ' + str(random.randint(1, 3)) + '},\n')
@@ -33,10 +43,23 @@ def writeJson(name):
                      str(random.randint(1, 5)) + '},\n')
     infile.write('    {"source": "' + name + '", "target": "' + friends[len(friends)-1].name + '", "value": ' +
                  str(random.randint(1, 5)) + '}\n  ]\n}')
-    for fr in friends[:-1]:
-       # friendsfriends=api.GetFriends(screen_name=)
-        a=fr
+
+    infile.close()
+    os.remove(oldfile)
+    return filename
+
+#writeJson('Archer_Sterling')
+
+def writefile(name):
+    oldfile = glob.glob('static/example*.txt')[0]
+    print oldfile
+    number = int(re.search('\d+', oldfile).group(0))
+    print number
+    number += 1
+    filename = 'static/example' + str(number) + '.txt'
+    infile = codecs.open(filename, 'w', 'utf-8')
+    infile.write('test' + str(number) + ' ' + name)
+    os.remove(oldfile)
     infile.close()
 
 
-#writeJson('Archer_Sterling')
