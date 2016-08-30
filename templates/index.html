@@ -65,11 +65,11 @@
             <p>Hover over the dots to see their names</p>
             <p>Drag them to see what happens</p>-->
                 {% endif %}
-        <p id="disclaimer">
+            <p id="disclaimer">
             <!--<svg width="500" height="600"></svg>-->
             Running on IBM Bluemix with the <a href="https://python-twitter.readthedocs.io/en/latest/">python-twitter </a>library.
                 Based on Mike Bostock's <a href="http://bl.ocks.org/mbostock/2675ff61ea5e063ede2b5d63c08020c7">Force Dragging I</a>.</p>
-            </div>
+        </div>
         <script>
 
         var svg = d3.select("svg"),
@@ -95,7 +95,7 @@
             .selectAll("circle")
             .data(graph.nodes)
             .enter().append("circle")
-              .attr("r", 2.5)
+              .attr("r", 5)
               .call(d3.drag()
                   .on("start", dragstarted)
                   .on("drag", dragged)

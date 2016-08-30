@@ -3,24 +3,23 @@
     <head>
         <meta charset="utf-8">
         <script src="//d3js.org/d3.v4.0.0-alpha.40.min.js"></script>
-
         <style>
         body {
-            //background: #c0e6ff;
-            background: #ff9eee;
+            background: #c0e6ff;
+            //background: #ff9eee;
             font-family: Arial, sans-serif;
         }
         #yep {
+            display: none;
             width:66%;
             margin: auto;
             color: #ff3ca0;
             font-size: 9px;
         }
-
         .links line {
           stroke: #aaa;
+            stroke-width:1px;
         }
-
         .nodes circle {
           pointer-events: all;
           stroke: none;
@@ -46,7 +45,7 @@
             color: #325c80;
         }
         svg {
-            width: 100%;s
+            width: 100%;
         }
         </style>
     </head>
@@ -60,34 +59,27 @@
         </h4>
             {%  if screenname %}
         <h1>
-            <a href="https://twitter.com/{{ screenname }}">{{ displayName }}</a>'s Twitter Friend
+            <a href="https://twitter.com/{{ screenname }}">{{ displayName }}</a>'s Twitter Friends
         </h1>
         Screenname: {{ screenname }}<br>
         Display name: {{ displayName }}<br>
         Number of friends: {{ nfriends }}<br><br>
-            <form action="">
-                <label for="screenname">Type a twitter handle or twitter profile link:</label>
-                <input type="text" name="screenname">
-                <input type="submit" value="submit">
-                <br>
-            </form>
-
-<br>
-            <p>Hover over the dots to see their names</p>
-            <p>Drag them and see what happens</p>
-
-
+                {% endif %}
+        <form action="">
+            <label for="screenname">Type a twitter handle or twitter profile link:</label>
+            <input type="text" name="screenname" onkeyup="showResult(this.value)">
+            <div class="livesearch"></div>
+            <input type="submit" value="submit">
+            <br>
+        </form>
+                {% if screenname %}
+        <br>
+        <p>Hover over the dots to see their names</p>
+        <p>Drag them and see what happens</p>
         <svg width="500" height="400"></svg>
-                {% else %}
-                <form action="">
-                <label for="screenname">Type a twitter handle or twitter profile link (p.e. 'archer_sterling' or 'twitter.com/archer_sterling'):</label><br>
-                <input type="text" name="screenname">
-                <input type="submit" value="submit">
-                <br><br><br>
+
+        <br><br><br>
             {% endif %}
-
-
-
         <p id="disclaimer">
             Running on IBM Bluemix with the <a href="https://python-twitter.readthedocs.io/en/latest/">python-twitter </a>library.
                 Based on Mike Bostock's <a href="http://bl.ocks.org/mbostock/2675ff61ea5e063ede2b5d63c08020c7">Force Dragging I</a>.</p>
@@ -117,7 +109,7 @@
             .selectAll("circle")
             .data(graph.nodes)
             .enter().append("circle")
-              .attr("r", 2.5)
+              .attr("r", 4)
               .call(d3.drag()
                   .on("start", dragstarted)
                   .on("drag", dragged)
@@ -161,5 +153,24 @@
         }
 
         </script>
+        <script>
+            function showResult(str){
+                if (str.length==0) {
+                    document.getElementById("livesearch").innerHTML="";
+                    document.getElementById("livesearch").style.border="0px";
+                    return;
+                }
+                xmlhttp=new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function() {
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                        document.getElementById("livesearch").innerHTML=xmlhttp.responseText;
+                        document.getElementById("livesearch").style.border="1px solid #A5ACB2";
+                    }
+                }
+                xmlhttp.open("GET","localhost:8080/"+str,true);
+                xmlhttp.send();
+            }
+        </script>
+
     </body>
 </html>
